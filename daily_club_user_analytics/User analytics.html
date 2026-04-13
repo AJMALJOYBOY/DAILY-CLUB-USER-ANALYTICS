@@ -866,6 +866,48 @@
         }
         const db = firebase.database();
 
+        // Mapping caches
+        let productMap = {};
+        let categoryMap = {};
+        let isMapInitialized = false;
+
+        async function initMaps() {
+            try {
+                // 1. Fetch Categories first
+                const catSnap = await db.ref('root/category').once('value');
+                const categories = catSnap.val();
+                if (categories) {
+                    // In your screenshot, the key (e.g., CBB0013) IS the category code.
+                    Object.entries(categories).forEach(([code, data]) => {
+                        if (data && data.name) {
+                            categoryMap[code] = data.name;
+                        }
+                    });
+                }
+
+                // 2. Fetch Products
+                const prodSnap = await db.ref('root/products').once('value');
+                const products = prodSnap.val();
+                if (products) {
+                    productMap = {};
+                    Object.values(products).forEach(p => {
+                        if (p.name && p.categoryCode) {
+                            // Link product name to the category NAME if available, otherwise code
+                            const catLabel = categoryMap[p.categoryCode] || p.categoryCode;
+                            productMap[p.name.toLowerCase().trim()] = catLabel;
+                        }
+                    });
+                    console.log("Maps loaded. Products:", Object.keys(productMap).length, "Categories:", Object.keys(categoryMap).length);
+                }
+                isMapInitialized = true;
+            } catch (e) {
+                console.error("Error initializing maps:", e);
+                isMapInitialized = true;
+            }
+        }
+
+        initMaps();
+
         // --- 1. DYNAMIC CHART LOGIC ---
         let categoryChart = null;
         const chartCtx = document.getElementById('categoryChart').getContext('2d');
@@ -1008,6 +1050,15 @@
 
             fetchBtn.disabled = true;
             fetchBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Fetching...';
+            
+            // Wait for product map if it's still loading
+            if (!isMapInitialized) {
+                let attempts = 0;
+                while (!isMapInitialized && attempts < 10) {
+                    await new Promise(r => setTimeout(r, 200));
+                    attempts++;
+                }
+            }
 
             try {
                 await fetchAndProcessAnalytics(phoneNumber);
@@ -1034,14 +1085,14 @@
             const ordersData = ordersSnap.val() || {};
             const walletOrdersData = walletOrdersSnap.val() || {};
 
-            // Normalize and Combine
+            // Normalize, Filter (Only Delivered), and Combine
             const ordersList = [
                 ...Object.keys(ordersData).map(id => ({ id, node: 'order', ...ordersData[id] })),
                 ...Object.keys(walletOrdersData).map(id => ({ id, node: 'walletOrder', ...walletOrdersData[id] }))
-            ];
+            ].filter(order => order.status && order.status.toLowerCase() === 'delivered');
 
             if (ordersList.length === 0) {
-                alert("No data found for this user.");
+                alert("No delivered orders found for this user.");
                 resetDashboard();
                 return;
             }
@@ -1116,7 +1167,38 @@
         }
 
         function inferCategory(itemName) {
-            const name = itemName.toLowerCase();
+            const normalizedName = itemName.toLowerCase().trim();
+            
+            // Priority 1: Exact Match
+            if (productMap[normalizedName]) {
+                console.log(`[Exact Match]: "${itemName}" -> ${productMap[normalizedName]}`);
+                return productMap[normalizedName];
+            }
+
+            // Priority 2: Fuzzy/Partial Match (Search if itemName contains a known product name)
+            let bestMatch = null;
+            let longestMatchLength = 0;
+
+            for (const prodKey in productMap) {
+                // If the item name contains the product name (e.g. "Ponni Ari 5kg" contains "Ponni Ari")
+                // Or vice-versa
+                if (normalizedName.includes(prodKey) || prodKey.includes(normalizedName)) {
+                    if (prodKey.length > longestMatchLength) {
+                        longestMatchLength = prodKey.length;
+                        bestMatch = productMap[prodKey];
+                    }
+                }
+            }
+
+            if (bestMatch) {
+                console.log(`[Partial Match]: "${itemName}" matched to database entry via keyword. Result: ${bestMatch}`);
+                return bestMatch;
+            }
+
+            console.log(`[No Match]: "${itemName}" not found in products. Falling back to keyword inference.`);
+
+            // Priority 2: Fallback to keyword inference
+            const name = normalizedName;
             if (name.includes('milk') || name.includes('dairy') || name.includes('curd')) return 'Dairy';
             if (name.includes('aval') || name.includes('rice') || name.includes('grain')) return 'Grains';
             if (name.includes('veg') || name.includes('onion') || name.includes('fruit')) return 'Produce';
