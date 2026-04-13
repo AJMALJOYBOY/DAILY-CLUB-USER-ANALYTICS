@@ -30,30 +30,22 @@
         }
 
         body {
-            background-color: #000;
+            background: radial-gradient(circle at top left, #1e1e2f, var(--bg-color));
+            background-attachment: fixed;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             color: var(--text-main);
-            padding: 20px;
         }
 
-        /* Mobile Device Container */
+        /* Container with no phone frame constraints */
         .device-container {
             width: 100%;
-            max-width: 400px;
-            height: 850px;
-            background: radial-gradient(circle at top left, #1e1e2f, var(--bg-color));
-            border-radius: 40px;
-            border: 8px solid #2a2b36;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-            overflow-y: auto;
+            max-width: 600px;
+            /* Keeps the UI centered and readable */
+            min-height: 100vh;
             position: relative;
-        }
-
-        .device-container::-webkit-scrollbar {
-            display: none;
         }
 
         .content-wrapper {
@@ -462,7 +454,7 @@
         }
 
         .coupon-card {
-            flex: 0 0 200px;
+            flex: 0 0 220px;
             scroll-snap-align: start;
             padding: 20px 16px;
             border-radius: 16px;
@@ -574,6 +566,14 @@
             color: #3b82f6;
         }
 
+        .theme-orange {
+            border-top: 3px solid #f97316;
+            box-shadow: 0 10px 20px rgba(249, 115, 22, 0.1);
+        }
+
+        .theme-orange .coupon-icon {
+            color: #f97316;
+        }
 
         /* Animations */
         @keyframes pulse {
@@ -730,6 +730,17 @@
                             <span class="order-total">₹1,240</span>
                         </div>
                     </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="order-info">
+                            <p class="order-id">Order #DC4489</p>
+                            <p class="order-status">Delivered • 09 Apr</p>
+                        </div>
+                        <div class="order-action">
+                            <span class="order-total">₹3,240</span>
+                            <button class="btn-reorder">Reorder</button>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -769,6 +780,18 @@
                         </div>
                         <button class="copy-btn" onclick="copyCouponCode(this, 'ADD150')">
                             <span>ADD150</span>
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+
+                    <div class="coupon-card theme-orange">
+                        <div>
+                            <i class="fa-solid fa-ice-cream coupon-icon"></i>
+                            <h3 class="coupon-title">Buy 1 Get 1</h3>
+                            <p class="coupon-desc">Beat the heat! BOGO on all premium ice creams.</p>
+                        </div>
+                        <button class="copy-btn" onclick="copyCouponCode(this, 'BOGOCREAM')">
+                            <span>BOGOCREAM</span>
                             <i class="fa-regular fa-copy"></i>
                         </button>
                     </div>
