@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Club Analytics</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <style>
         :root {
             --bg-color: #0d0e15;
@@ -45,7 +47,7 @@
             background: radial-gradient(circle at top left, #1e1e2f, var(--bg-color));
             border-radius: 40px;
             border: 8px solid #2a2b36;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
             overflow-y: auto;
             position: relative;
         }
@@ -53,7 +55,7 @@
         .device-container::-webkit-scrollbar {
             display: none;
         }
-        
+
         .content-wrapper {
             padding: 24px 20px;
             display: flex;
@@ -62,12 +64,46 @@
         }
 
         /* Header */
-        header { display: flex; justify-content: space-between; align-items: center; }
-        .user-info { display: flex; align-items: center; gap: 12px; }
-        .avatar { width: 40px; height: 40px; background: var(--primary-gradient); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.2rem; }
-        h1 { font-size: 1.4rem; font-weight: 700; }
-        .header-icons i { font-size: 1.2rem; margin-left: 15px; color: var(--text-muted); cursor: pointer; transition: color 0.3s ease; }
-        .header-icons i:hover { color: var(--text-main); }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .header-icons i {
+            font-size: 1.2rem;
+            margin-left: 15px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .header-icons i:hover {
+            color: var(--text-main);
+        }
 
         /* Glassmorphism Base Card */
         .glass-card {
@@ -80,9 +116,16 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
 
-        h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-        /* Segmented Control (Slide Buttons) */
+        /* Segmented Control */
         .segmented-control {
             display: flex;
             background: rgba(255, 255, 255, 0.05);
@@ -112,29 +155,113 @@
         .segmented-control button.active {
             background: rgba(255, 255, 255, 0.12);
             color: #fff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         /* Wallet Section */
-        .wallet-card { position: relative; overflow: hidden; }
-        .wallet-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 60%); z-index: 0; animation: rotateGlow 10s linear infinite; }
-        .wallet-content { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; }
-        .wallet-info p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
-        .progress-container { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 10px; overflow: hidden; }
-        .progress-bar { height: 100%; width: 84%; background: var(--primary-gradient); border-radius: 4px; box-shadow: 0 0 10px rgba(168, 85, 247, 0.5); animation: slideIn 1.5s ease-out; }
-        .lock-icon-wrapper { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2); animation: pulse 2s infinite; }
-        .lock-icon-wrapper i { font-size: 1.5rem; color: #fcd34d; }
+        .wallet-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wallet-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 60%);
+            z-index: 0;
+            animation: rotateGlow 10s linear infinite;
+        }
+
+        .wallet-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wallet-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 84%;
+            background: var(--primary-gradient);
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+            animation: slideIn 1.5s ease-out;
+        }
+
+        .lock-icon-wrapper {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        .lock-icon-wrapper i {
+            font-size: 1.5rem;
+            color: #fcd34d;
+        }
 
         /* Chart Section */
-        .chart-container { position: relative; height: 220px; width: 100%; display: flex; justify-content: center; }
-        .total-spent { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; transition: opacity 0.3s; }
-        .total-spent span { font-size: 0.8rem; color: var(--text-muted); }
-        .total-spent h3 { font-size: 1.3rem; font-weight: 700; }
+        .chart-container {
+            position: relative;
+            height: 220px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .total-spent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .total-spent span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .total-spent h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
 
         /* Dynamic Item List Section */
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .section-header h2 { margin-bottom: 0; }
-        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .section-header h2 {
+            margin-bottom: 0;
+        }
+
         .btn-sort-dir {
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid var(--glass-border);
@@ -145,27 +272,68 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .btn-sort-dir:active { transform: scale(0.95); }
 
-        .item-list-container { display: flex; flex-direction: column; gap: 8px; }
+        .btn-sort-dir:active {
+            transform: scale(0.95);
+        }
+
+        .item-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
         .purchase-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 12px;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0, 0, 0, 0.2);
             border-radius: 12px;
             border: 1px solid transparent;
             transition: border 0.3s ease;
             animation: fadeSlideUp 0.4s ease-out;
         }
-        .purchase-item:hover { border: 1px solid rgba(168, 85, 247, 0.3); }
-        .item-left { display: flex; align-items: center; gap: 12px; }
-        .item-icon-small { font-size: 1.5rem; width: 44px; height: 44px; background: rgba(255,255,255,0.05); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.05); }
-        .item-name { font-size: 0.95rem; font-weight: 600; }
-        .item-cat { font-size: 0.75rem; color: var(--text-muted); }
-        .item-metrics { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-        
+
+        .purchase-item:hover {
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .item-icon-small {
+            font-size: 1.5rem;
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .item-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .item-cat {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .item-metrics {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
         .metric-badge {
             font-weight: 700;
             padding: 4px 10px;
@@ -173,54 +341,307 @@
             font-size: 0.8rem;
             transition: all 0.3s ease;
         }
+
         .metric-highlight {
             color: #fff;
             background: linear-gradient(135deg, #a855f7, #6366f1);
             box-shadow: 0 4px 10px rgba(168, 85, 247, 0.2);
         }
+
         .metric-dim {
             color: var(--text-muted);
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         /* Timeline Section */
-        .timeline { position: relative; padding-left: 20px; }
-        .timeline::before { content: ''; position: absolute; left: 5px; top: 5px; bottom: 5px; width: 2px; background: var(--glass-border); }
-        .timeline-item { position: relative; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .timeline-item:last-child { margin-bottom: 0; }
-        .timeline-dot { position: absolute; left: -20px; width: 12px; height: 12px; border-radius: 50%; background: #3b82f6; box-shadow: 0 0 8px #3b82f6; }
-        .timeline-item:nth-child(2) .timeline-dot { background: #10b981; box-shadow: 0 0 8px #10b981; }
-        .timeline-item:nth-child(3) .timeline-dot { background: #a855f7; box-shadow: 0 0 8px #a855f7; }
-        .order-info p { margin-bottom: 4px; }
-        .order-id { font-weight: 600; font-size: 0.95rem; }
-        .order-status { font-size: 0.8rem; color: #10b981; }
-        .order-action { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-        .order-total { font-weight: 700; }
-        .btn-reorder { background: var(--accent-orange); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: transform 0.2s, background 0.2s; }
-        .btn-reorder:active { transform: scale(0.95); background: #ea580c; }
+        .timeline {
+            position: relative;
+            padding-left: 20px;
+        }
 
-        /* Offers Carousel */
-        .offers-container { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; }
-        .offers-container::-webkit-scrollbar { display: none; }
-        .coupon-card { flex: 0 0 160px; scroll-snap-align: start; padding: 16px; border-radius: 16px; background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.15); position: relative; overflow: hidden; }
-        .coupon-card::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent); transform: skewX(-20deg); animation: shimmer 3s infinite; }
-        .coupon-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 5px; color: #fff;}
-        .coupon-desc { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; }
-        .coupon-code { font-size: 0.7rem; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 4px; display: inline-block; border: 1px dashed rgba(255,255,255,0.3); }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 5px;
+            bottom: 5px;
+            width: 2px;
+            background: var(--glass-border);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #3b82f6;
+            box-shadow: 0 0 8px #3b82f6;
+        }
+
+        .timeline-item:nth-child(2) .timeline-dot {
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        .timeline-item:nth-child(3) .timeline-dot {
+            background: #a855f7;
+            box-shadow: 0 0 8px #a855f7;
+        }
+
+        .order-info p {
+            margin-bottom: 4px;
+        }
+
+        .order-id {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .order-status {
+            font-size: 0.8rem;
+            color: #10b981;
+        }
+
+        .order-action {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .order-total {
+            font-weight: 700;
+        }
+
+        .btn-reorder {
+            background: var(--accent-orange);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn-reorder:active {
+            transform: scale(0.95);
+            background: #ea580c;
+        }
+
+        /* Interactive Coupons Section */
+        .offers-section {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+
+        .offers-container {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            scroll-snap-type: x mandatory;
+        }
+
+        .offers-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .coupon-card {
+            flex: 0 0 200px;
+            scroll-snap-align: start;
+            padding: 20px 16px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 2px dashed rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .coupon-card::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -8px;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 14px;
+            background-color: var(--bg-color);
+            border-radius: 50%;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .coupon-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transform: skewX(-20deg);
+            animation: shimmer 4s infinite;
+        }
+
+        .coupon-icon {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .coupon-title {
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+
+        .coupon-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .copy-btn {
+            background: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px dashed rgba(255, 255, 255, 0.4);
+            font-size: 0.8rem;
+            font-family: monospace;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Color Themes for Coupons */
+        .theme-purple {
+            border-top: 3px solid #a855f7;
+            box-shadow: 0 10px 20px rgba(168, 85, 247, 0.1);
+        }
+
+        .theme-purple .coupon-icon {
+            color: #a855f7;
+        }
+
+        .theme-pink {
+            border-top: 3px solid #ec4899;
+            box-shadow: 0 10px 20px rgba(236, 72, 153, 0.1);
+        }
+
+        .theme-pink .coupon-icon {
+            color: #ec4899;
+        }
+
+        .theme-blue {
+            border-top: 3px solid #3b82f6;
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
+        }
+
+        .theme-blue .coupon-icon {
+            color: #3b82f6;
+        }
+
 
         /* Animations */
-        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(252, 211, 77, 0.4); } 70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(252, 211, 77, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(252, 211, 77, 0); } }
-        @keyframes rotateGlow { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes slideIn { from { width: 0; } }
-        @keyframes shimmer { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
-        @keyframes fadeSlideUp { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(252, 211, 77, 0.4);
+            }
+
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(252, 211, 77, 0);
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(252, 211, 77, 0);
+            }
+        }
+
+        @keyframes rotateGlow {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                width: 0;
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+
+            20% {
+                left: 200%;
+            }
+
+            100% {
+                left: 200%;
+            }
+        }
+
+        @keyframes fadeSlideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
+
 <body>
 
     <div class="device-container">
         <div class="content-wrapper">
-            
+
             <header>
                 <div class="user-info">
                     <div class="avatar">A</div>
@@ -230,7 +651,6 @@
                     </div>
                 </div>
                 <div class="header-icons">
-                    <i class="fa-regular fa-comment-dots"></i>
                     <i class="fa-regular fa-bell"></i>
                 </div>
             </header>
@@ -253,7 +673,7 @@
 
             <section class="glass-card">
                 <h2>Spending Categories</h2>
-                
+
                 <div class="segmented-control" id="chartTabs">
                     <button class="active" data-chart="doughnut"><i class="fa-solid fa-chart-pie"></i> Pie</button>
                     <button data-chart="bar"><i class="fa-solid fa-chart-simple"></i> Bar</button>
@@ -281,9 +701,9 @@
                     <button class="active" data-sort="quantity">Sort by Qty</button>
                     <button data-sort="price">Sort by Price</button>
                 </div>
-                
+
                 <div class="item-list-container" id="dynamicItemList">
-                    </div>
+                </div>
             </section>
 
             <section class="glass-card">
@@ -313,6 +733,49 @@
                 </div>
             </section>
 
+            <section class="offers-section">
+                <h2 style="margin-bottom: 15px; padding-left: 5px; font-size: 1.2rem;">Rewards & Offers</h2>
+                <div class="offers-container">
+
+                    <div class="coupon-card theme-purple">
+                        <div>
+                            <i class="fa-solid fa-carrot coupon-icon"></i>
+                            <h3 class="coupon-title">20% OFF</h3>
+                            <p class="coupon-desc">Valid on all fresh organic produce and dairy.</p>
+                        </div>
+                        <button class="copy-btn" onclick="copyCouponCode(this, 'VEG20')">
+                            <span>VEG20</span>
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+
+                    <div class="coupon-card theme-pink">
+                        <div>
+                            <i class="fa-solid fa-motorcycle coupon-icon"></i>
+                            <h3 class="coupon-title">FREE Delivery</h3>
+                            <p class="coupon-desc">Get your items delivered for free on orders above ₹499.</p>
+                        </div>
+                        <button class="copy-btn" onclick="copyCouponCode(this, 'FREEDEL')">
+                            <span>FREEDEL</span>
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+
+                    <div class="coupon-card theme-blue">
+                        <div>
+                            <i class="fa-solid fa-wallet coupon-icon"></i>
+                            <h3 class="coupon-title">₹150 Cashback</h3>
+                            <p class="coupon-desc">Add money to your Daily Club wallet and get instant cashback.</p>
+                        </div>
+                        <button class="copy-btn" onclick="copyCouponCode(this, 'ADD150')">
+                            <span>ADD150</span>
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
         </div>
     </div>
 
@@ -321,8 +784,7 @@
         let categoryChart = null;
         const chartCtx = document.getElementById('categoryChart').getContext('2d');
         const centerText = document.getElementById('chartCenterText');
-        
-        // Base Data
+
         const chartLabels = ['Groceries', 'Snacks', 'Dairy', 'Fruits', 'Household'];
         const chartDataValues = [6500, 4800, 3200, 2100, 1850];
         const chartColors = ['#3b82f6', '#f97316', '#a855f7', '#10b981', '#64748b'];
@@ -331,27 +793,14 @@
         Chart.defaults.font.family = 'Plus Jakarta Sans';
 
         function renderChart(type) {
-            // Destroy existing chart if it exists
-            if (categoryChart) {
-                categoryChart.destroy();
-            }
-
-            // Hide center text if not a doughnut
+            if (categoryChart) categoryChart.destroy();
             centerText.style.opacity = type === 'doughnut' ? '1' : '0';
 
-            // Configure scales for Bar/Line vs Doughnut
             let scalesConfig = {};
             if (type === 'bar' || type === 'line') {
                 scalesConfig = {
-                    y: { 
-                        beginAtZero: true, 
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                        border: { display: false }
-                    },
-                    x: { 
-                        grid: { display: false },
-                        border: { display: false }
-                    }
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } },
+                    x: { grid: { display: false }, border: { display: false } }
                 };
             }
 
@@ -365,9 +814,9 @@
                         backgroundColor: type === 'line' ? 'rgba(168, 85, 247, 0.2)' : chartColors,
                         borderColor: type === 'line' ? '#a855f7' : undefined,
                         borderWidth: type === 'line' ? 3 : 0,
-                        borderRadius: type === 'bar' ? 6 : 0, // Rounded corners for bars
-                        tension: 0.4, // Smooth curves for line chart
-                        fill: type === 'line' // Fill under the line
+                        borderRadius: type === 'bar' ? 6 : 0,
+                        tension: 0.4,
+                        fill: type === 'line'
                     }]
                 },
                 options: {
@@ -375,32 +824,17 @@
                     maintainAspectRatio: false,
                     cutout: type === 'doughnut' ? '75%' : undefined,
                     scales: scalesConfig,
-                    animation: {
-                        duration: 1000,
-                        easing: 'easeOutQuart'
-                    },
+                    animation: { duration: 1000, easing: 'easeOutQuart' },
                     plugins: {
                         legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            padding: 12,
-                            cornerRadius: 8,
-                            displayColors: type !== 'line', // Hide color box on line tooltip
-                            callbacks: {
-                                label: function(context) {
-                                    return ' ₹' + context.raw.toLocaleString();
-                                }
-                            }
-                        }
+                        tooltip: { backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: 12, cornerRadius: 8, displayColors: type !== 'line', callbacks: { label: function (context) { return ' ₹' + context.raw.toLocaleString(); } } }
                     }
                 }
             });
         }
 
-        // Initialize default chart (Doughnut)
         renderChart('doughnut');
 
-        // Handle Chart Toggle Clicks
         const chartTabs = document.querySelectorAll('#chartTabs button');
         chartTabs.forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -411,7 +845,6 @@
             });
         });
 
-
         // --- 2. DYNAMIC SORTABLE LIST LOGIC ---
         const purchaseData = [
             { id: 1, name: "Fresh Milk (500ml)", category: "Dairy", icon: "🥛", count: 18, price: 540 },
@@ -421,30 +854,25 @@
             { id: 5, name: "Cola (750ml)", category: "Drinks", icon: "🥤", count: 2, price: 180 }
         ];
 
-        let activeSortMetric = 'quantity'; // 'quantity' or 'price'
+        let activeSortMetric = 'quantity';
         let isDescending = true;
-        
+
         const listContainer = document.getElementById('dynamicItemList');
         const sortDirBtn = document.getElementById('sortDirBtn');
         const sortIcon = document.getElementById('sortIcon');
         const sortMetricTabs = document.querySelectorAll('#sortMetricTabs button');
 
         function renderList() {
-            // Sort array based on selected metric and direction
             const sortedData = [...purchaseData].sort((a, b) => {
                 let valA = activeSortMetric === 'quantity' ? a.count : a.price;
                 let valB = activeSortMetric === 'quantity' ? b.count : b.price;
                 return isDescending ? valB - valA : valA - valB;
             });
 
-            // Clear current list
             listContainer.innerHTML = '';
 
-            // Inject sorted items
             sortedData.forEach((item, index) => {
-                const animationDelay = index * 0.05; 
-                
-                // Determine which badge gets the highlight colors
+                const animationDelay = index * 0.05;
                 const qtyClass = activeSortMetric === 'quantity' ? 'metric-highlight' : 'metric-dim';
                 const priceClass = activeSortMetric === 'price' ? 'metric-highlight' : 'metric-dim';
 
@@ -466,7 +894,6 @@
                 listContainer.insertAdjacentHTML('beforeend', itemHTML);
             });
 
-            // Update Direction Icon UI
             if (isDescending) {
                 sortIcon.className = "fa-solid fa-arrow-down-wide-short";
             } else {
@@ -474,26 +901,44 @@
             }
         }
 
-        // Handle Metric Slider Clicks
         sortMetricTabs.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 sortMetricTabs.forEach(t => t.classList.remove('active'));
                 const clickedBtn = e.currentTarget;
                 clickedBtn.classList.add('active');
-                
                 activeSortMetric = clickedBtn.getAttribute('data-sort');
                 renderList();
             });
         });
 
-        // Handle Direction Button Click
         sortDirBtn.addEventListener('click', () => {
             isDescending = !isDescending;
             renderList();
         });
 
-        // Initial List Render
         renderList();
+
+        // --- 3. COUPON COPY LOGIC ---
+        function copyCouponCode(btnElement, codeText) {
+            navigator.clipboard.writeText(codeText).then(() => {
+                const originalHTML = btnElement.innerHTML;
+                const originalBg = btnElement.style.background;
+                const originalBorder = btnElement.style.border;
+
+                btnElement.innerHTML = `<span>Copied!</span><i class="fa-solid fa-check"></i>`;
+                btnElement.style.background = '#10b981';
+                btnElement.style.border = '1px solid #10b981';
+
+                setTimeout(() => {
+                    btnElement.innerHTML = originalHTML;
+                    btnElement.style.background = originalBg;
+                    btnElement.style.border = originalBorder;
+                }, 2000);
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        }
     </script>
 </body>
+
 </html>
