@@ -593,6 +593,72 @@
             }
         }
 
+        /* Search Slot */
+        .search-section {
+            padding: 10px;
+            margin-bottom: 0px;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 12px 18px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-container:focus-within {
+            border-color: #a855f7;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .search-container i {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .search-container input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1rem;
+            font-weight: 500;
+            outline: none;
+            width: 100%;
+        }
+
+        .search-container button {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-container button:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+        }
+
+        .search-container button:active {
+            transform: scale(0.95);
+        }
+
         @keyframes rotateGlow {
             0% {
                 transform: rotate(0deg);
@@ -611,15 +677,11 @@
 
         @keyframes shimmer {
             0% {
-                left: -100%;
-            }
-
-            20% {
-                left: 200%;
+                background-position: -468px 0;
             }
 
             100% {
-                left: 200%;
+                background-position: 468px 0;
             }
         }
 
@@ -635,6 +697,10 @@
             }
         }
     </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
 </head>
 
 <body>
@@ -644,10 +710,10 @@
 
             <header>
                 <div class="user-info">
-                    <div class="avatar">A</div>
+                    <div class="avatar" id="userAvatar">A</div>
                     <div>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">Hi, Ajmal N!</p>
-                        <h1>Daily Club Insights</h1>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);" id="userGreeting">Welcome back!</p>
+                        <h1 id="userNameDisplay">Daily Club Analytics</h1>
                     </div>
                 </div>
                 <div class="header-icons">
@@ -655,18 +721,28 @@
                 </div>
             </header>
 
+            <!-- Number Upload Slot -->
+            <section class="glass-card search-section">
+                <div class="search-container">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <input type="text" id="phoneInput" placeholder="Enter or paste number (e.g. 8139001980)">
+                    <button id="fetchBtn"><i class="fa-solid fa-bolt"></i> Fetch</button>
+                </div>
+            </section>
+
             <section class="glass-card wallet-card">
                 <div class="wallet-content">
                     <div class="wallet-info">
-                        <h2 style="margin-bottom: 4px;">Unlock Your Wallet</h2>
-                        <p>Progress: 84% - ₹1,680 of ₹2,000 goal</p>
+                        <h2 style="margin-bottom: 4px;" id="walletTitle">Wallet Balance</h2>
+                        <p id="walletBalanceText">₹0.00</p>
                         <div class="progress-container">
-                            <div class="progress-bar"></div>
+                            <div class="progress-bar" id="walletProgressBar" style="width: 0%"></div>
                         </div>
-                        <p style="margin-top: 8px; font-size: 0.75rem; color: #a855f7;">₹320 more to unlock!</p>
+                        <p style="margin-top: 8px; font-size: 0.75rem; color: #a855f7;" id="walletStatusText">Enter a
+                            number to fetch wallet details</p>
                     </div>
                     <div class="lock-icon-wrapper">
-                        <i class="fa-solid fa-lock"></i>
+                        <i class="fa-solid fa-wallet"></i>
                     </div>
                 </div>
             </section>
@@ -684,7 +760,7 @@
                     <canvas id="categoryChart"></canvas>
                     <div class="total-spent" id="chartCenterText">
                         <span>Total Spent</span>
-                        <h3>₹18,450</h3>
+                        <h3 id="totalSpentText">₹0</h3>
                     </div>
                 </div>
             </section>
@@ -708,39 +784,8 @@
 
             <section class="glass-card">
                 <h2>Recent Orders</h2>
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="order-info">
-                            <p class="order-id">Order #DC4532</p>
-                            <p class="order-status">Delivered • Today</p>
-                        </div>
-                        <div class="order-action">
-                            <span class="order-total">₹850</span>
-                            <button class="btn-reorder">Reorder</button>
-                        </div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="order-info">
-                            <p class="order-id">Order #DC4501</p>
-                            <p class="order-status">Delivered • 14 Apr</p>
-                        </div>
-                        <div class="order-action">
-                            <span class="order-total">₹1,240</span>
-                        </div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="order-info">
-                            <p class="order-id">Order #DC4489</p>
-                            <p class="order-status">Delivered • 09 Apr</p>
-                        </div>
-                        <div class="order-action">
-                            <span class="order-total">₹3,240</span>
-                            <button class="btn-reorder">Reorder</button>
-                        </div>
-                    </div>
+                <div class="timeline" id="ordersTimeline">
+                    <p style="color: var(--text-muted); text-align: center; padding: 20px;">No numbers fetched yet.</p>
                 </div>
             </section>
 
@@ -803,14 +848,32 @@
     </div>
 
     <script>
+        // --- 0. FIREBASE INTEGRATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBUhKliTOKWKVW-TCTaYiRN9FXCjoxcsHg",
+            authDomain: "dclub-32718.firebaseapp.com",
+            databaseURL: "https://dclub-32718-default-rtdb.firebaseio.com",
+            projectId: "dclub-32718",
+            storageBucket: "dclub-32718.firebasestorage.app",
+            messagingSenderId: "401946278556",
+            appId: "1:401946278556:web:efd912ca5196ce248b0b59",
+            measurementId: "G-Q9RCRR7K"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
         // --- 1. DYNAMIC CHART LOGIC ---
         let categoryChart = null;
         const chartCtx = document.getElementById('categoryChart').getContext('2d');
         const centerText = document.getElementById('chartCenterText');
 
-        const chartLabels = ['Groceries', 'Snacks', 'Dairy', 'Fruits', 'Household'];
-        const chartDataValues = [6500, 4800, 3200, 2100, 1850];
-        const chartColors = ['#3b82f6', '#f97316', '#a855f7', '#10b981', '#64748b'];
+        let chartLabels = [];
+        let chartDataValues = [];
+        const chartColors = ['#6366f1', '#a855f7', '#ec4899', '#f97316', '#10b981', '#3b82f6'];
 
         Chart.defaults.color = '#94a3b8';
         Chart.defaults.font.family = 'Plus Jakarta Sans';
@@ -832,7 +895,7 @@
                 data: {
                     labels: chartLabels,
                     datasets: [{
-                        label: 'Spent (₹)',
+                        label: 'Amount (₹)',
                         data: chartDataValues,
                         backgroundColor: type === 'line' ? 'rgba(168, 85, 247, 0.2)' : chartColors,
                         borderColor: type === 'line' ? '#a855f7' : undefined,
@@ -845,18 +908,16 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: type === 'doughnut' ? '75%' : undefined,
+                    cutout: type === 'doughnut' ? '70%' : undefined,
                     scales: scalesConfig,
                     animation: { duration: 1000, easing: 'easeOutQuart' },
                     plugins: {
                         legend: { display: false },
-                        tooltip: { backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: 12, cornerRadius: 8, displayColors: type !== 'line', callbacks: { label: function (context) { return ' ₹' + context.raw.toLocaleString(); } } }
+                        tooltip: { backgroundColor: 'rgba(0, 0, 0, 0.85)', padding: 12, cornerRadius: 10, titleFont: { size: 13 }, bodyFont: { size: 14, weight: 'bold' }, callbacks: { label: (ctx) => ` ₹${ctx.raw.toLocaleString()}` } }
                     }
                 }
             });
         }
-
-        renderChart('doughnut');
 
         const chartTabs = document.querySelectorAll('#chartTabs button');
         chartTabs.forEach(btn => {
@@ -864,19 +925,12 @@
                 chartTabs.forEach(t => t.classList.remove('active'));
                 const clickedBtn = e.currentTarget;
                 clickedBtn.classList.add('active');
-                renderChart(clickedBtn.getAttribute('data-chart'));
+                if (chartLabels.length > 0) renderChart(clickedBtn.getAttribute('data-chart'));
             });
         });
 
         // --- 2. DYNAMIC SORTABLE LIST LOGIC ---
-        const purchaseData = [
-            { id: 1, name: "Fresh Milk (500ml)", category: "Dairy", icon: "🥛", count: 18, price: 540 },
-            { id: 2, name: "Farm Eggs (6 pack)", category: "Dairy", icon: "🥚", count: 12, price: 960 },
-            { id: 3, name: "Potato Chips", category: "Snacks", icon: "🥔", count: 8, price: 320 },
-            { id: 4, name: "Whole Wheat Bread", category: "Bakery", icon: "🍞", count: 5, price: 250 },
-            { id: 5, name: "Cola (750ml)", category: "Drinks", icon: "🥤", count: 2, price: 180 }
-        ];
-
+        let purchaseData = [];
         let activeSortMetric = 'quantity';
         let isDescending = true;
 
@@ -886,6 +940,11 @@
         const sortMetricTabs = document.querySelectorAll('#sortMetricTabs button');
 
         function renderList() {
+            if (purchaseData.length === 0) {
+                listContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">No items found.</p>';
+                return;
+            }
+
             const sortedData = [...purchaseData].sort((a, b) => {
                 let valA = activeSortMetric === 'quantity' ? a.count : a.price;
                 let valB = activeSortMetric === 'quantity' ? b.count : b.price;
@@ -902,7 +961,7 @@
                 const itemHTML = `
                     <div class="purchase-item" style="animation-delay: ${animationDelay}s; animation-fill-mode: both;">
                         <div class="item-left">
-                            <div class="item-icon-small">${item.icon}</div>
+                            <div class="item-icon-small">${item.icon || '📦'}</div>
                             <div>
                                 <h4 class="item-name">${item.name}</h4>
                                 <p class="item-cat">${item.category}</p>
@@ -917,11 +976,7 @@
                 listContainer.insertAdjacentHTML('beforeend', itemHTML);
             });
 
-            if (isDescending) {
-                sortIcon.className = "fa-solid fa-arrow-down-wide-short";
-            } else {
-                sortIcon.className = "fa-solid fa-arrow-up-short-wide";
-            }
+            sortIcon.className = isDescending ? "fa-solid fa-arrow-down-wide-short" : "fa-solid fa-arrow-up-short-wide";
         }
 
         sortMetricTabs.forEach(btn => {
@@ -939,28 +994,272 @@
             renderList();
         });
 
-        renderList();
+        // --- 3. FETCHING & ANALYTICS ENGINE ---
+        const phoneInput = document.getElementById('phoneInput');
+        const fetchBtn = document.getElementById('fetchBtn');
+        const ordersTimeline = document.getElementById('ordersTimeline');
+        const walletBalanceText = document.getElementById('walletBalanceText');
+        const walletProgressBar = document.getElementById('walletProgressBar');
+        const walletStatusText = document.getElementById('walletStatusText');
 
-        // --- 3. COUPON COPY LOGIC ---
+        fetchBtn.addEventListener('click', async () => {
+            const phoneNumber = phoneInput.value.trim();
+            if (!phoneNumber) return alert("Please enter a valid phone number");
+
+            fetchBtn.disabled = true;
+            fetchBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Fetching...';
+
+            try {
+                await fetchAndProcessAnalytics(phoneNumber);
+            } catch (err) {
+                console.error(err);
+                alert("Failed to fetch data. Check console for details.");
+            } finally {
+                fetchBtn.disabled = false;
+                fetchBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Fetch';
+            }
+        });
+
+        async function fetchAndProcessAnalytics(phoneNumber) {
+            const num = parseInt(phoneNumber);
+
+            // 1. Fetch from BOTH nodes
+            // root/order is indexed by child 'phnm'
+            // root/walletOrders is nested by phoneNumber
+            const [ordersSnap, walletOrdersSnap] = await Promise.all([
+                db.ref('root/order').orderByChild('phnm').equalTo(num).once('value'),
+                db.ref('root/walletOrders').child(phoneNumber).once('value')
+            ]);
+
+            const ordersData = ordersSnap.val() || {};
+            const walletOrdersData = walletOrdersSnap.val() || {};
+
+            // Normalize and Combine
+            const ordersList = [
+                ...Object.keys(ordersData).map(id => ({ id, node: 'order', ...ordersData[id] })),
+                ...Object.keys(walletOrdersData).map(id => ({ id, node: 'walletOrder', ...walletOrdersData[id] }))
+            ];
+
+            if (ordersList.length === 0) {
+                alert("No data found for this user.");
+                resetDashboard();
+                return;
+            }
+
+            // Sort by date (desc)
+            ordersList.sort((a, b) => new Date(b.status_updated_at) - new Date(a.status_updated_at));
+
+            // 2. Aggregate Data
+            let totalSpent = 0;
+            let categories = {};
+            let itemMetrics = {};
+            let userName = ordersList[0].name || "Customer";
+
+            ordersList.forEach(order => {
+                let i = 1;
+                // Process dynamic items (item1, item2...)
+                while (order[`item${i}`]) {
+                    const itemName = order[`item${i}`];
+                    // Handle potential wallet-based pricing or default
+                    let itemPrice = order[`price${i}`] || 45;
+
+                    // If it's a wallet order, try to parse price from paymentMethod (e.g. wallet-60)
+                    if (order.node === 'walletOrder' && order.paymentMethod && order.paymentMethod.includes('wallet-')) {
+                        const priceFromMethod = parseInt(order.paymentMethod.replace('wallet-', ''));
+                        if (!isNaN(priceFromMethod) && i === 1) itemPrice = priceFromMethod;
+                    }
+
+                    totalSpent += itemPrice;
+
+                    // Category aggregation
+                    const cat = inferCategory(itemName);
+                    categories[cat] = (categories[cat] || 0) + itemPrice;
+
+                    // Item frequency
+                    if (!itemMetrics[itemName]) {
+                        itemMetrics[itemName] = { count: 0, price: 0, icon: getIcon(itemName) };
+                    }
+                    itemMetrics[itemName].count++;
+                    itemMetrics[itemName].price += itemPrice;
+
+                    i++;
+                }
+            });
+
+            // 3. Update UI Elements
+            document.getElementById('userNameDisplay').innerText = userName;
+            document.getElementById('userGreeting').innerText = `Insights for ${phoneNumber}`;
+            document.getElementById('userAvatar').innerText = userName.charAt(0).toUpperCase();
+            document.getElementById('totalSpentText').innerText = `₹${totalSpent.toLocaleString()}`;
+
+            // Update Charts
+            chartLabels = Object.keys(categories);
+            chartDataValues = Object.values(categories);
+            const activeChart = document.querySelector('#chartTabs button.active').getAttribute('data-chart');
+            renderChart(activeChart);
+
+            // Update Purchase List
+            purchaseData = Object.keys(itemMetrics).map(name => ({
+                name,
+                category: inferCategory(name),
+                icon: itemMetrics[name].icon,
+                count: itemMetrics[name].count,
+                price: itemMetrics[name].price
+            }));
+            renderList();
+
+            // Update Timeline
+            updateTimeline(ordersList);
+
+            // Update Wallet (Attempt to find walletBalance in root/users)
+            updateWalletInfo(phoneNumber, totalSpent);
+        }
+
+        function inferCategory(itemName) {
+            const name = itemName.toLowerCase();
+            if (name.includes('milk') || name.includes('dairy') || name.includes('curd')) return 'Dairy';
+            if (name.includes('aval') || name.includes('rice') || name.includes('grain')) return 'Grains';
+            if (name.includes('veg') || name.includes('onion') || name.includes('fruit')) return 'Produce';
+            if (name.includes('chip') || name.includes('snack') || name.includes('cola')) return 'Snacks';
+            return 'General';
+        }
+
+        function getIcon(itemName) {
+            const name = itemName.toLowerCase();
+            if (name.includes('milk')) return '🥛';
+            if (name.includes('aval')) return '🥣';
+            if (name.includes('chip')) return '🥔';
+            if (name.includes('cola')) return '🥤';
+            if (name.includes('onion')) return '🧅';
+            return '📦';
+        }
+
+        function updateTimeline(orders) {
+            ordersTimeline.innerHTML = '';
+            orders.slice(0, 5).forEach(order => {
+                const date = new Date(order.status_updated_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+                const total = calculateOrderTotal(order);
+                const html = `
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="order-info">
+                            <p class="order-id">#${order.id.slice(-6).toUpperCase()}</p>
+                            <p class="order-status">${order.status} • ${date}</p>
+                        </div>
+                        <div class="order-action">
+                            <span class="order-total">₹${total}</span>
+                            <button class="btn-reorder" onclick="alert('Viewing order ${order.id}')">View</button>
+                        </div>
+                    </div>
+                `;
+                ordersTimeline.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function calculateOrderTotal(order) {
+            let total = 0; let i = 1;
+            while (order[`item${i}`]) {
+                total += order[`price${i}`] || 45;
+                i++;
+            }
+            return total;
+        }
+
+        async function updateWalletInfo(phoneNumber, totalSpent) {
+            try {
+                // All potential paths based on user feedback
+                const paths = [
+                    `root/walletusers/${phoneNumber}`,
+                    `root/walletOrders/${phoneNumber}`,
+                    `root/wallet/${phoneNumber}`,
+                    `root/users/${phoneNumber}`
+                ];
+                
+                let data = null;
+                let foundPath = "";
+
+                for (const path of paths) {
+                    const snap = await db.ref(path).once('value');
+                    if (snap.exists()) {
+                        data = snap.val();
+                        foundPath = path;
+                        break;
+                    }
+                }
+
+                console.log(`Wallet search finished. Found at: ${foundPath || "none"}`, data);
+
+                let balance = 0;
+                let credit = totalSpent || 0;
+                let found = data !== null;
+
+                if (found) {
+                    if (typeof data === 'object') {
+                        // Priority mappings from the screenshot: walletBalance, creditAmount
+                        balance = data.walletBalance || data.balance || data.wallet || 0;
+                        credit = data.creditAmount || data.limit || data.credit || credit;
+                    } else {
+                        balance = parseFloat(data) || 0;
+                    }
+                }
+
+                const due = Math.max(0, credit - balance);
+                
+                walletBalanceText.innerHTML = `
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <span style="font-size: 2.22rem; font-weight: 800; color: #fff;">₹${balance.toLocaleString()}</span>
+                        <span style="font-size: 0.75rem; color: #10b981; font-weight: 800; letter-spacing: 0.6px;">SYNCED BALANCE</span>
+                    </div>
+                `;
+                
+                const target = credit > 0 ? credit : 5000;
+                const percent = Math.min((balance / target) * 100, 100);
+                
+                walletProgressBar.style.width = `${percent}%`;
+                walletProgressBar.style.transition = "width 1s ease-in-out";
+                walletProgressBar.style.background = balance > 0 ? 'var(--primary-gradient)' : '#333';
+                
+                if (found) {
+                    walletStatusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981"></i> Source: ${foundPath} • Limit: ₹${credit.toLocaleString()} • Due: ₹${due.toLocaleString()}`;
+                    document.getElementById('walletTitle').innerText = "Wallet Dashboard";
+                } else {
+                    walletStatusText.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Data not found in wallet nodes`;
+                    document.getElementById('walletTitle').innerText = "Wallet Balance";
+                }
+
+            } catch (e) {
+                console.error("Wallet fetch error:", e);
+                walletStatusText.innerText = "Error syncing wallet";
+            }
+        }
+
+
+        function resetDashboard() {
+            purchaseData = [];
+            chartLabels = [];
+            chartDataValues = [];
+            renderList();
+            if (categoryChart) categoryChart.destroy();
+            ordersTimeline.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">No data found for this number.</p>';
+            walletBalanceText.innerText = "₹0.00";
+            walletStatusText.innerText = "Enter a number to fetch wallet details";
+            walletProgressBar.style.width = "0%";
+            document.getElementById('userNameDisplay').innerText = "Daily Club Analytics";
+        }
+
+        // --- 4. COUPON COPY LOGIC ---
         function copyCouponCode(btnElement, codeText) {
             navigator.clipboard.writeText(codeText).then(() => {
                 const originalHTML = btnElement.innerHTML;
-                const originalBg = btnElement.style.background;
-                const originalBorder = btnElement.style.border;
-
                 btnElement.innerHTML = `<span>Copied!</span><i class="fa-solid fa-check"></i>`;
                 btnElement.style.background = '#10b981';
-                btnElement.style.border = '1px solid #10b981';
-
                 setTimeout(() => {
                     btnElement.innerHTML = originalHTML;
-                    btnElement.style.background = originalBg;
-                    btnElement.style.border = originalBorder;
+                    btnElement.style.background = '';
                 }, 2000);
-            }).catch(err => {
-                console.error('Could not copy text: ', err);
             });
         }
+
     </script>
 </body>
 
