@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Club Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #0d0e15;
+            --glass-bg: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary-gradient: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-orange: #f97316;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+            padding: 20px;
+        }
+
+        /* Mobile Device Container */
+        .device-container {
+            width: 100%;
+            max-width: 400px;
+            height: 850px;
+            background: radial-gradient(circle at top left, #1e1e2f, var(--bg-color));
+            border-radius: 40px;
+            border: 8px solid #2a2b36;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Hide Scrollbar for clean look */
+        .device-container::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .content-wrapper {
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .header-icons i {
+            font-size: 1.2rem;
+            margin-left: 15px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .header-icons i:hover {
+            color: var(--text-main);
+        }
+
+        /* Glassmorphism Base Card */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Wallet Section */
+        .wallet-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wallet-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 60%);
+            z-index: 0;
+            animation: rotateGlow 10s linear infinite;
+        }
+
+        .wallet-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wallet-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 84%;
+            background: var(--primary-gradient);
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+            animation: slideIn 1.5s ease-out;
+        }
+
+        .lock-icon-wrapper {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: pulse 2s infinite;
+        }
+
+        .lock-icon-wrapper i {
+            font-size: 1.5rem;
+            color: #fcd34d;
+        }
+
+        /* Chart Section */
+        .chart-container {
+            position: relative;
+            height: 220px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .total-spent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .total-spent span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .total-spent h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        /* Most Purchased */
+        .top-item-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+        }
+
+        .item-details h4 {
+            font-size: 1rem;
+        }
+        .item-details p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .item-icon {
+            font-size: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Timeline Section */
+        .timeline {
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 5px;
+            bottom: 5px;
+            width: 2px;
+            background: var(--glass-border);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #3b82f6;
+            box-shadow: 0 0 8px #3b82f6;
+        }
+
+        .timeline-item:nth-child(2) .timeline-dot { background: #10b981; box-shadow: 0 0 8px #10b981; }
+        .timeline-item:nth-child(3) .timeline-dot { background: #a855f7; box-shadow: 0 0 8px #a855f7; }
+
+        .order-info p { margin-bottom: 4px; }
+        .order-id { font-weight: 600; font-size: 0.95rem; }
+        .order-status { font-size: 0.8rem; color: #10b981; }
+        
+        .order-action {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+        
+        .order-total { font-weight: 700; }
+
+        .btn-reorder {
+            background: var(--accent-orange);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn-reorder:active {
+            transform: scale(0.95);
+            background: #ea580c;
+        }
+
+        /* Offers Carousel */
+        .offers-container {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scroll-snap-type: x mandatory;
+        }
+
+        .offers-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .coupon-card {
+            flex: 0 0 160px;
+            scroll-snap-align: start;
+            padding: 16px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+            border: 1px solid rgba(255,255,255,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .coupon-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+            transform: skewX(-20deg);
+            animation: shimmer 3s infinite;
+        }
+
+        .coupon-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 5px; color: #fff;}
+        .coupon-desc { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; }
+        .coupon-code { 
+            font-size: 0.7rem; 
+            background: rgba(0,0,0,0.3); 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            display: inline-block;
+            border: 1px dashed rgba(255,255,255,0.3);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(252, 211, 77, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(252, 211, 77, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(252, 211, 77, 0); }
+        }
+
+        @keyframes rotateGlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from { width: 0; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            20% { left: 200%; }
+            100% { left: 200%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="device-container">
+        <div class="content-wrapper">
+            
+            <header>
+                <div class="user-info">
+                    <div class="avatar">A</div>
+                    <div>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Hi, Ajmal N!</p>
+                        <h1>Daily Club Insights</h1>
+                    </div>
+                </div>
+                <div class="header-icons">
+                    <i class="fa-regular fa-comment-dots"></i>
+                    <i class="fa-regular fa-bell"></i>
+                </div>
+            </header>
+
+            <section class="glass-card wallet-card">
+                <div class="wallet-content">
+                    <div class="wallet-info">
+                        <h2 style="margin-bottom: 4px;">Unlock Your Wallet</h2>
+                        <p>Progress: 84% - ₹1,680 of ₹2,000 goal</p>
+                        <div class="progress-container">
+                            <div class="progress-bar"></div>
+                        </div>
+                        <p style="margin-top: 8px; font-size: 0.75rem; color: #a855f7;">₹320 more to unlock!</p>
+                    </div>
+                    <div class="lock-icon-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                </div>
+            </section>
+
+            <section class="glass-card">
+                <h2>Spending Categories <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem; color: #94a3b8;"></i></h2>
+                
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                    <div class="total-spent">
+                        <span>Total Spent</span>
+                        <h3>₹18,450</h3>
+                    </div>
+                </div>
+
+                <div class="top-item-card">
+                    <div class="item-details">
+                        <span style="font-size: 0.75rem; color: #a855f7; font-weight: 600;">MOST PURCHASED</span>
+                        <h4>Fresh Milk (500ml)</h4>
+                        <p>18 Orders this month</p>
+                    </div>
+                    <div class="item-icon">
+                        🥛
+                    </div>
+                </div>
+            </section>
+
+            <section class="glass-card">
+                <h2>Recent Orders</h2>
+                <div class="timeline">
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="order-info">
+                            <p class="order-id">Order #DC4532</p>
+                            <p class="order-status">Delivered • Today</p>
+                        </div>
+                        <div class="order-action">
+                            <span class="order-total">₹850</span>
+                            <button class="btn-reorder">Reorder</button>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="order-info">
+                            <p class="order-id">Order #DC4501</p>
+                            <p class="order-status">Delivered • 14 Apr</p>
+                        </div>
+                        <div class="order-action">
+                            <span class="order-total">₹1,240</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="order-info">
+                            <p class="order-id">Order #DC4489</p>
+                            <p class="order-status">Delivered • 09 Apr</p>
+                        </div>
+                        <div class="order-action">
+                            <span class="order-total">₹3,240</span>
+                            <button class="btn-reorder">Reorder</button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section style="margin-bottom: 20px;">
+                <h2 style="margin-bottom: 12px; padding-left: 5px;">Exclusive Offers</h2>
+                <div class="offers-container">
+                    
+                    <div class="coupon-card" style="border-top: 2px solid #a855f7;">
+                        <h3 class="coupon-title">Get 20% OFF</h3>
+                        <p class="coupon-desc">On Fresh Produce</p>
+                        <span class="coupon-code">CODE: VEG20</span>
+                    </div>
+
+                    <div class="coupon-card" style="border-top: 2px solid #ec4899;">
+                        <h3 class="coupon-title">FREE Delivery</h3>
+                        <p class="coupon-desc">Orders above ₹499</p>
+                        <span class="coupon-code">CODE: FREEDEL</span>
+                    </div>
+
+                    <div class="coupon-card" style="border-top: 2px solid #3b82f6;">
+                        <h3 class="coupon-title">₹150 Cashback</h3>
+                        <p class="coupon-desc">On Snacks & Drinks</p>
+                        <span class="coupon-code">CODE: SNK150</span>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        // Chart.js Configuration for the Donut Chart
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            
+            // Subtle entrance animation for the chart
+            Chart.defaults.animation.duration = 2000;
+            Chart.defaults.animation.easing = 'easeOutQuart';
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Groceries', 'Snacks & Drinks', 'Dairy', 'Fruits & Veg', 'Household'],
+                    datasets: [{
+                        data: [25, 22, 16, 15, 12],
+                        backgroundColor: [
+                            '#3b82f6', // Blue
+                            '#f97316', // Orange
+                            '#a855f7', // Purple
+                            '#10b981', // Green
+                            '#64748b'  // Slate
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%', // Makes it a thin donut
+                    plugins: {
+                        legend: {
+                            display: false // We hide the default legend for a cleaner look
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: { family: 'Plus Jakarta Sans', size: 13 },
+                            bodyFont: { family: 'Plus Jakarta Sans', size: 12 },
+                            cornerRadius: 8,
+                            displayColors: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
